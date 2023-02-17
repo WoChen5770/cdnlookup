@@ -57,7 +57,7 @@ func dnsquery(domain string, ip string, DnsServer string, OnlyIp bool, repeat in
 				} else {
 					print("CDN:")
 					httpGet(answer.(*dns.A).A.String())
-					println(answer.(*dns.A).A.String())
+					println(" ", answer.(*dns.A).A.String())
 				}
 			} else if answer.Header().Rrtype == dns.TypeAAAA {
 				IpMap[answer.(*dns.AAAA).AAAA.String()] = true
@@ -75,9 +75,8 @@ func main() {
 	var OnlyIp = flag.Bool("i", false, "Only output ip addr")
 	var repeat = flag.Int("r", 1, "repeat query rounds")
 	var v6 = flag.Bool("6", false, "query AAAA (ipv6)")
-	fmt.Println("开始请求：domain", *domain, "DnsServer:", *DnsServer)
-
 	flag.Parse()
+	fmt.Println("开始请求：domain", *domain, "DnsServer:", *DnsServer)
 	IpMap = make(map[string]bool)
 	if (*ip != "") || (*v6) {
 		*OnlyIp = true
@@ -115,7 +114,6 @@ func httpGet(ip string) {
 	str := string(body)
 	province := gjson.Get(str, "province")
 	city := gjson.Get(str, "city")
-	area := gjson.Get(str, "area")
 	isp := gjson.Get(str, "isp")
-	fmt.Print(province, city, area, isp)
+	fmt.Print(province, city, isp)
 }
