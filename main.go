@@ -75,6 +75,8 @@ func main() {
 	var OnlyIp = flag.Bool("i", false, "Only output ip addr")
 	var repeat = flag.Int("r", 1, "repeat query rounds")
 	var v6 = flag.Bool("6", false, "query AAAA (ipv6)")
+	fmt.Println("开始请求：domain", *domain, "DnsServer:", *DnsServer)
+
 	flag.Parse()
 	IpMap = make(map[string]bool)
 	if (*ip != "") || (*v6) {
