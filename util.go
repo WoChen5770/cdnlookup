@@ -1,7 +1,12 @@
 package main
 
+import (
+	"sort"
+)
+
 var countryMap map[string]string
 var CityMap map[string]string
+var keys []string
 
 func Initlist() {
 	CityMap = make(map[string]string)
@@ -59,4 +64,9 @@ func Initlist() {
 	CityMap["江苏 南京 联通"] = "218.104.118.33"
 	CityMap["江苏 南京 电信"] = "58.212.24.1"
 	CityMap["江苏 南京 教育网"] = "202.119.32.7"
+
+	for k := range CityMap {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
 }

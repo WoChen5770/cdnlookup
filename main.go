@@ -82,19 +82,18 @@ func main() {
 		*OnlyIp = true
 		dnsquery(*domain, *ip, *DnsServer, *OnlyIp, *repeat, *v6)
 	} else {
-		for city, ip := range CityMap {
+		for _, k := range keys {
 			if !*OnlyIp {
 				fmt.Println()
-				fmt.Println("ECS:", city, ip)
+				fmt.Println("ECS:", k, CityMap[k])
 			}
-			dnsquery(*domain, ip, *DnsServer, *OnlyIp, *repeat, *v6)
-
+			dnsquery(*domain, CityMap[k], *DnsServer, *OnlyIp, *repeat, *v6)
 		}
 	}
 
 	if *OnlyIp {
-		for ip, _ := range IpMap {
-			println(ip)
+		for _, k := range keys {
+			println(CityMap[k])
 		}
 	}
 
