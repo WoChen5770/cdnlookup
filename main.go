@@ -4,8 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"github.com/miekg/dns"
-	"log"
+	"github.com/tidwall/gjson"
+	"io/ioutil"
 	"net"
+	"net/http"
 	"strings"
 )
 
@@ -45,7 +47,7 @@ func dnsquery(domain string, ip string, DnsServer string, OnlyIp bool, repeat in
 		in, _, err := c.Exchange(m, DnsServer) //注意:要选择支持自定义EDNS的DNS 或者是 目标NS服务器  国内DNS大部分不支持自定义EDNS数据
 
 		if err != nil {
-			log.Fatal(err)
+
 		}
 		for _, answer := range in.Answer {
 
@@ -53,6 +55,8 @@ func dnsquery(domain string, ip string, DnsServer string, OnlyIp bool, repeat in
 				if OnlyIp {
 					IpMap[answer.(*dns.A).A.String()] = true
 				} else {
+					print("CDN:")
+					httpGet(answer.(*dns.A).A.String())
 					println(answer.(*dns.A).A.String())
 				}
 			} else if answer.Header().Rrtype == dns.TypeAAAA {
@@ -66,7 +70,7 @@ func dnsquery(domain string, ip string, DnsServer string, OnlyIp bool, repeat in
 func main() {
 	Initlist()
 	var domain = flag.String("d", "www.taobao.com", "domain")
-	var DnsServer = flag.String("s", "8.8.8.8:53", "dns server addr")
+	var DnsServer = flag.String("s", "119.29.29.29:53", "dns server addr")
 	var ip = flag.String("ip", "", "client ip")
 	var OnlyIp = flag.Bool("i", false, "Only output ip addr")
 	var repeat = flag.Int("r", 1, "repeat query rounds")
@@ -79,7 +83,8 @@ func main() {
 	} else {
 		for city, ip := range CityMap {
 			if !*OnlyIp {
-				fmt.Println(city)
+				fmt.Println()
+				fmt.Println("ECS:", city, ip)
 			}
 			dnsquery(*domain, ip, *DnsServer, *OnlyIp, *repeat, *v6)
 
@@ -92,4 +97,23 @@ func main() {
 		}
 	}
 
+}
+
+func httpGet(ip string) {
+	resp, err := http.Get("https://ip.useragentinfo.com/json?ip=" + ip)
+	if err != nil {
+		// handle error
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		// handle error
+	}
+	str := string(body)
+	province := gjson.Get(str, "province")
+	city := gjson.Get(str, "city")
+	area := gjson.Get(str, "area")
+	isp := gjson.Get(str, "isp")
+	fmt.Print(province, city, area, isp)
 }
